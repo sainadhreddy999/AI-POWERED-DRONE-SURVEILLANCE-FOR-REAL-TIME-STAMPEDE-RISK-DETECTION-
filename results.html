@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Processing Results - Stampede Predictor</title>
+  <link rel="icon" href="{{ url_for('static', filename='StampedeAi_Icon.png') }}" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* --- Replicated Styles (Ideally from a shared CSS) --- */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+    /* */
+
+    :root {
+      /* Define common colors - adapted from live.html & index.html */
+      --primary-dark: #0f172a;
+      /* */
+      --primary-blue: #3b82f6;
+      /* */
+      --white: #ffffff;
+      /* */
+      --text-dark: #1e293b;
+      /* */
+      --text-muted: #64748b;
+      /* */
+      --bg-gradient-start: #f7f9fc;
+      /* */
+      --bg-gradient-end: #dbeafe;
+      /* */
+      --border-grey: #ccc;
+      /* */
+      --shadow-light: rgba(0, 0, 0, 0.05);
+      /* Adjusted from */
+      --shadow-medium: rgba(0, 0, 0, 0.1);
+      /* Adjusted from */
+
+      /* Status colors (Consider aligning with live.html vars) */
+      --status-critical-bg: #fee2e2;
+      /* */
+      --status-critical-fg: #b91c1c;
+      /* */
+      --status-critical-border: #fca5a5;
+      /* */
+
+      --status-warning-bg: #fef3c7;
+      /* */
+      --status-warning-fg: #b45309;
+      /* */
+      --status-warning-border: #fde68a;
+      /* */
+
+      --status-normal-bg: #ecfdf5;
+      /* */
+      --status-normal-fg: #047857;
+      /* */
+      --status-normal-border: #a7f3d0;
+      /* */
+
+      --error-bg: var(--status-critical-bg);
+      --error-fg: var(--status-critical-fg);
+      /* */
+      --error-border: var(--status-critical-border);
+    }
+
+    * {
+      box-sizing: border-box;
+      /* */
+      margin: 0;
+      /* */
+      padding: 0;
+      /* */
+    }
+
+    html {
+      scroll-behavior: smooth;
+      /* */
+      scroll-padding-top: 80px;
+      /* Adjust to match header height */
+      /* */
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      /* */
+      background: linear-gradient(to right, var(--bg-gradient-start), var(--bg-gradient-end));
+      /* */
+      color: var(--text-dark);
+      /* */
+      margin: 0;
+      /* */
+      line-height: 1.6;
+      /* */
+      min-height: 100vh;
+      position: relative;
+      padding-top: 75px;
+      /* Space for fixed header */
+      padding-bottom: 80px;
+      /* Space for footer */
+      overflow-x: hidden;
+      /* */
+    }
+
+    /* Navbar Styles (from index.html) */
+    nav {
+      background-color: var(--primary-dark);
+      /* */
+      color: var(--white);
+      /* */
+      padding: 10px 30px;
+      /* Adjusted padding */
+      display: flex;
+      /* */
+      justify-content: space-between;
+      /* */
+      align-items: center;
+      /* */
+      box-shadow: 0 4px 10px var(--shadow-medium);
+      /* */
+      position: fixed;
+      /* Changed to fixed */
+      top: 0;
+      /* */
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      /* */
+      min-height: 60px;
+      /* */
+    }
+
+    .logo-container {
+      display: flex;
+      /* */
+      align-items: center;
+      /* */
+      gap: 10px;
+      /* */
+    }
+
+    .logo-container img {
+      height: 45px;
+      /* Adjusted size */
+      /* Similar to */
+    }
+
+    nav h2 {
+      margin: 0;
+      /* */
+      font-size: 1.4rem;
+      /* Adjusted size */
+      /* Similar to */
+      font-weight: 600;
+      /* */
+      color: var(--white);
+      /* */
+    }
+
+    nav ul {
+      list-style: none;
+      /* */
+      display: flex;
+      /* */
+      gap: 25px;
+      /* */
+      margin: 0;
+      /* */
+      padding: 0;
+      /* */
+    }
+
+    nav ul li a {
+      color: var(--white);
+      /* */
+      text-decoration: none;
+      /* */
+      font-weight: 500;
+      /* */
+      position: relative;
+      /* */
+      padding-bottom: 5px;
+      /* */
+      transition: color 0.3s;
+      /* */
+    }
+
+    nav ul li a::after {
+      content: "";
+      /* */
+      position: absolute;
+      /* */
+      width: 0;
+      /* */
+      height: 3px;
+      /* */
+      bottom: 0;
+      /* */
+      left: 0;
+      /* */
+      background: var(--primary-blue);
+      /* Adjusted color */
+      /* Similar to */
+      transition: width 0.3s ease-in-out;
+      /* */
+      border-radius: 2px;
+      /* */
+    }
+
+    nav ul li a:hover::after {
+      width: 100%;
+      /* */
+    }
+
+    nav ul li a:hover {
+      color: var(--primary-blue);
+      /* Adjusted color */
+      /* Similar to */
+    }
+
+    /* --- Results Page Specific Styles --- */
+    .results-content {
+      max-width: 900px;
+      /* */
+      margin: 30px auto;
+      /* Adjusted margin */
+      background: var(--white);
+      /* */
+      padding: 30px 40px;
+      /* Adjusted padding */
+      /* */
+      border-radius: 20px;
+      /* */
+      box-shadow: 0 10px 25px var(--shadow-light);
+      /* */
+      backdrop-filter: blur(5px);
+      /* Optional: subtle blur */
+    }
+
+    h1 {
+      text-align: center;
+      /* */
+      margin: 0 0 25px;
+      /* Adjusted margin */
+      /* */
+      font-size: 2.1rem;
+      /* */
+      color: var(--primary-dark);
+      /* */
+      font-weight: 700;
+      /* */
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      /* Adjusted */
+      /* */
+      margin-bottom: 8px;
+      /* */
+      font-weight: 600;
+    }
+
+    .status-container {
+      text-align: center;
+      /* */
+      padding: 20px;
+      /* */
+      border-radius: 12px;
+      /* */
+      font-weight: 600;
+      /* */
+      margin-bottom: 30px;
+      /* */
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+      /* */
+      border: 1px solid transparent;
+    }
+
+    /* Status Color Classes */
+    .status-low {
+      background-color: var(--status-normal-bg);
+      /* */
+      color: var(--status-normal-fg);
+      /* */
+      border-color: var(--status-normal-border);
+      /* */
+    }
+
+    .status-moderate {
+      background-color: var(--status-warning-bg);
+      /* */
+      color: var(--status-warning-fg);
+      /* */
+      border-color: var(--status-warning-border);
+      /* */
+    }
+
+    .status-high {
+      background-color: var(--status-critical-bg);
+      /* */
+      color: var(--status-critical-fg);
+      /* */
+      border-color: var(--status-critical-border);
+      /* */
+    }
+
+    .risk-badge {
+      font-size: 1.2rem;
+      /* Increased size */
+      /* */
+      margin-top: 5px;
+      /* */
+      font-weight: bold;
+      /* */
+    }
+
+    .media-display h3 {
+      /* Added heading for media section */
+      text-align: center;
+      font-size: 1.3rem;
+      color: var(--primary-dark);
+      margin-bottom: 15px;
+    }
+
+    video,
+    img {
+      display: block;
+      /* */
+      margin: 10px auto 15px auto;
+      /* Adjusted margin */
+      /* */
+      max-width: 100%;
+      /* */
+      max-height: 65vh;
+      /* Adjusted height */
+      /* */
+      border-radius: 12px;
+      /* */
+
+      object-fit: contain;
+      /* */
+      box-shadow: 0 4px 12px var(--shadow-light);
+      /* Added shadow */
+    }
+
+    video {
+      border: 1px solid var(--border-grey);
+      /* */
+    }
+
+    .media-caption {
+      text-align: center;
+      /* */
+      font-size: 0.9em;
+      /* */
+      color: var(--text-muted);
+      /* */
+      margin-top: -5px;
+      margin-bottom: 25px;
+    }
+
+    .metrics {
+      text-align: center;
+      /* */
+      margin: 30px 0 20px 0;
+      /* Adjusted margin */
+      padding: 15px;
+      background-color: #f8f9fa;
+      /* Light background for metrics */
+      border-radius: 10px;
+      border: 1px solid #eee;
+    }
+
+    .metrics p {
+      font-size: 1rem;
+      /* Increased size */
+      /* */
+      color: var(--text-grey);
+      /* */
+      margin: 8px 0;
+      /* Adjusted margin */
+      /* */
+    }
+
+    .metrics p strong {
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    .download-button {
+      background-color: var(--primary-blue);
+      /* */
+      color: white;
+      /* */
+      padding: 12px 24px;
+      /* */
+      border: none;
+      /* */
+      border-radius: 10px;
+      /* */
+      cursor: pointer;
+      /* */
+      font-size: 1rem;
+      /* */
+      font-weight: 600;
+      display: block;
+      /* */
+      width: fit-content;
+      /* Fit button to text */
+      margin: 25px auto;
+      /* */
+      text-align: center;
+      /* */
+      text-decoration: none;
+      /* */
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      /* */
+    }
+
+    .download-button:hover {
+      background-color: #2563eb;
+      /* */
+      transform: translateY(-2px) scale(1.03);
+      /* */
+      box-shadow: 0 6px 15px var(--shadow-light);
+      /* Added shadow */
+    }
+
+    .error-message {
+      text-align: center;
+      /* */
+      color: var(--error-fg);
+      /* */
+      background-color: var(--error-bg);
+      border: 1px solid var(--error-border);
+      font-weight: bold;
+      /* */
+      margin: 20px auto;
+      /* */
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 80%;
+    }
+
+    .error-message p {
+      margin: 5px 0;
+    }
+
+    .error-details {
+      font-size: 0.9em;
+      /* */
+      font-weight: normal;
+    }
+
+    /* Footer Styles (from index.html) */
+    footer {
+      text-align: center;
+      /* */
+      padding: 20px;
+      /* */
+      font-size: 0.9rem;
+      /* */
+      color: var(--text-muted);
+      /* */
+      margin-top: 40px;
+      /* */
+      background-color: #f1f5f9;
+      /* Similar to */
+      border-top: 1px solid #e2e8f0;
+      /* */
+      position: absolute;
+      /* */
+      bottom: 0;
+      /* */
+      width: 100%;
+      /* */
+    }
+
+    footer div {
+      max-width: 700px;
+      /* */
+      margin: 0 auto;
+      /* */
+    }
+
+    footer span {
+      font-weight: 600;
+      /* */
+    }
+
+    footer p:last-child {
+      font-size: 0.8em;
+      /* */
+      color: #888;
+      /* */
+    }
+
+    /* Hamburger placeholder (if implementing mobile nav toggle) */
+    .hamburger {
+      display: none;
+    }
+
+    /* */
+
+    /* Media Queries for Responsiveness */
+    @media (max-width: 768px) {
+      body {
+        padding-top: 65px;
+        /* Adjust if mobile header height changes */
+        padding-bottom: 100px;
+        /* Adjust for footer */
+      }
+
+      nav {
+        padding: 8px 20px;
+        /* */
+        min-height: 55px;
+        /* */
+      }
+
+      .logo-container img {
+        height: 35px;
+      }
+
+      /* */
+      nav h2 {
+        font-size: 1.2rem;
+      }
+
+      /* */
+      nav ul {
+        display: none;
+      }
+
+      /* Hide desktop nav items, implement mobile menu if needed */
+
+      .results-content {
+        padding: 20px;
+        /* */
+        margin: 20px auto;
+        /* */
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      /* */
+      h2 {
+        font-size: 1.2rem;
+      }
+
+      .risk-badge {
+        font-size: 1.1rem;
+      }
+
+      /* */
+      .media-display h3 {
+        font-size: 1.1rem;
+      }
+
+      .metrics p {
+        font-size: 0.9rem;
+      }
+
+      /* */
+      .download-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+
+      /* */
+      .error-message {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="logo-container">
+      <img src="{{ url_for('static', filename='StampedeAi_Logo.png') }}" alt="Stampede AI Logo">
+      <h2>Stampede Predictor</h2>
+    </div>
+    <div class="hamburger">
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <ul>
+      <li><a href="{{ url_for('index_route') }}">Home</a></li>
+      <li><a href="{{ url_for('dashboard_route') }}">Dashboard</a></li>
+      <li><a href="{{ url_for('live_route') }}">Live Feed</a></li>
+    </ul>
+  </nav>
+
+  <div class="results-content">
+    <h1>📊 Media Analysis Result</h1>
+
+    {# Determine and assign density level classes #}
+    {% set status_class = 'status-low' %} {# Default class #}
+    {% set density_label = 'Low Crowd Density' %} {# Default label #}
+    {% if prediction_status and ('CRITICAL RISK' in prediction_status or 'Critical Density Cell Detected' in
+    prediction_status) %} {# #}
+    {% set status_class = 'status-high' %} {# #}
+    {% set density_label = 'High Crowd Density (⚠️ Critical Risk)' %} {# #}
+    {% elif prediction_status and 'Warning' in prediction_status %} {# #}
+    {% set status_class = 'status-moderate' %} {# #}
+    {% set density_label = 'Moderate Crowd Density (⚠️ Warning)' %} {# #}
+    {% elif prediction_status and 'Detected' in prediction_status %} {# #}
+    {% set status_class = 'status-moderate' %} {# #}
+    {% set density_label = 'Moderate Crowd Density' %} {# #}
+    {% elif prediction_status and 'Error' in prediction_status %}
+    {% set status_class = 'status-high' %} {# Use high risk color for errors #}
+    {% set density_label = 'Error During Analysis' %} {# Specific label for errors #}
+    {% endif %}
+
+    <div class="status-container {{ status_class }}" id="status-container">
+      <h2>Overall Risk Status:</h2>
+      <div class="risk-badge">{{ density_label }}</div>
+      {# Hidden input to easily access status in JS if needed #}
+      <input type="hidden" id="prediction-status" value="{{ prediction_status | default('Unknown Status') }}">
+    </div>
+
+    {% if processed_media_url %}
+    <div class="media-display">
+      {% if output_media_type == 'video' %}
+      <h3>🖼️ Most Critical Frame</h3>
+      <img src="{{ processed_media_url }}" alt="Critical Frame from Video Analysis">
+      <p class="media-caption">(Snapshot based on full video analysis)</p> {% if download_video_url %}
+      <a href="{{ download_video_url }}" download class="download-button">⬇️ Download Full Processed Video</a> {% else
+      %}
+      <div class="error-message">
+        <p>⚠️ Full processed video could not be generated or is unavailable.</p>
+      </div>
+      {% endif %}
+      {% elif output_media_type == 'image' %}
+      <h3>🖼️ Processed Image</h3>
+      <img src="{{ processed_media_url }}" alt="Processed Image"> {% else %}
+      {# Fallback for unknown type if URL exists #}
+      <h3>🖼️ Processed Media</h3>
+      <img src="{{ processed_media_url }}" alt="Processed Media">
+      <p class="media-caption">(Displayed as image due to unrecognized type: {{ output_media_type | default('Unknown')
+        }})</p>
+      {% endif %}
+    </div>
+
+    <div class="metrics">
+      <p>👥 Max Persons Detected: <strong>{{ max_persons | default('N/A') }}</strong></p>
+      <p>⏱️ Processing Time: <strong>{{ processing_time | default('N/A') }} seconds</strong></p>
+      {% if csv_data %}
+      <a href="data:text/csv;charset=utf-8,{{ csv_data | urlencode }}" download="stampede_analysis_report.csv"
+        class="download-button" style="background-color: var(--secondary-green);">
+        ⬇️ Download CSV Report
+      </a>
+      {% endif %}
+    </div>
+
+    {% else %}
+    {# Case where processing failed and no media URL generated #}
+    <div class="error-message">
+      <p>⚠️ Media processing failed.</p> {% if prediction_status and 'Error' in prediction_status %}
+      <p class="error-details">Details: {{ prediction_status }}</p> {% else %}
+      <p class="error-details">No processed media could be generated. Please check the input file or server logs.</p>
+      {% endif %}
+    </div>
+    {% if max_persons is defined or processing_time is defined %}
+    <div class="metrics">
+      <p>👥 Max Persons Detected: <strong>{{ max_persons | default('N/A') }}</strong></p>
+      <p>⏱️ Processing Time: <strong>{{ processing_time | default('N/A') }} seconds</strong></p>
+    </div>
+    {% endif %}
+    {% endif %}
+
+  </div>
+  <footer>
+    <div>
+      <p>&copy; 2025 <span>Team Arete</span>. All rights reserved.</p>
+      <p>Stampede Prediction Project</p>
+    </div>
+  </footer>
+
+  <audio id="criticalBeep" src="{{ url_for('static', filename='beep.mp3') }}" preload="auto"></audio>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const predictionStatusElement = document.getElementById('prediction-status'); //
+      const audioElement = document.getElementById('criticalBeep'); //
+
+      if (predictionStatusElement && audioElement) {
+        try {
+          const predictionStatus = predictionStatusElement.value; //
+          // Play sound for critical or high warning statuses
+          if (predictionStatus.includes('CRITICAL RISK') || predictionStatus.includes('Critical Density Cell Detected') || predictionStatus.includes('Warning')) { // // Added Warning
+            // Attempt to play audio, handling potential autoplay restrictions
+            audioElement.play().catch(error => { //
+              console.warn('Autoplay prevented critical beep sound:', error);
+              // Optional: Display a visual cue for the user to enable sound
+            });
+          }
+        } catch (e) {
+          console.error("Error accessing prediction status for audio alert:", e);
+        }
+      } else {
+        if (!predictionStatusElement) console.warn("Prediction status element not found for audio alert.");
+        if (!audioElement) console.warn("Audio element 'criticalBeep' not found.");
+      }
+
+      // Optional: Add mobile navigation toggle JS here if hamburger is implemented
+      // const hamburger = document.querySelector('.hamburger');
+      // const navMenu = document.querySelector('nav ul');
+      // if(hamburger && navMenu) {
+      //   hamburger.addEventListener('click', () => {
+      //     navMenu.classList.toggle('active'); // Requires '.active' CSS for mobile menu display
+      //     document.body.classList.toggle('nav-open'); // Optional: for body styles when menu is open
+      //   });
+      // }
+    });
+  </script>
+
+</body>
+
+</html>

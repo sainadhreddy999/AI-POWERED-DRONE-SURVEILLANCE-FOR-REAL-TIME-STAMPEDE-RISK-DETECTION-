@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enterprise Multi-Camera Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --primary-dark: #0f172a;
+            --primary-blue: #3b82f6;
+            --white: #ffffff;
+            --bg-dark: #1e293b;
+            --text-light: #f8fafc;
+            --shadow-float: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            background-color: #000;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #334155;
+        }
+        
+        nav h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        nav a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background-color: rgba(59, 130, 246, 0.1);
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .dashboard-container {
+            flex: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .camera-card {
+            background-color: var(--bg-dark);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-float);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #475569;
+        }
+
+        .camera-header {
+            padding: 12px 20px;
+            background-color: #0f172a;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .camera-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            margin: 0;
+        }
+
+        .camera-status {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background-color: #22c55e;
+            color: #000;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .camera-feed {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            background-color: #000;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h2>📹 Enterprise Multi-Camera Dashboard</h2>
+        <div>
+            <a href="/">← Exit Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Camera 0 -->
+        <div class="camera-card">
+            <div class="camera-header">
+                <p class="camera-title">Cam 1: North Gate</p>
+                <div class="camera-status">Active</div>
+            </div>
+            <img class="camera-feed" src="/video_feed?camera=0" alt="Camera 0 Feed">
+        </div>
+
+        <!-- Camera 1 -->
+        <div class="camera-card">
+            <div class="camera-header">
+                <p class="camera-title">Cam 2: Center Pathway</p>
+                <div class="camera-status">Active</div>
+            </div>
+            <img class="camera-feed" src="/video_feed?camera=1" alt="Camera 1 Feed">
+        </div>
+
+        <!-- Camera 2 -->
+        <div class="camera-card">
+            <div class="camera-header">
+                <p class="camera-title">Cam 3: South Exit</p>
+                <div class="camera-status">Active</div>
+            </div>
+            <img class="camera-feed" src="/video_feed?camera=2" alt="Camera 2 Feed">
+        </div>
+
+        <!-- Camera 3 -->
+        <div class="camera-card">
+            <div class="camera-header">
+                <p class="camera-title">Cam 4: Corridor A</p>
+                <div class="camera-status" style="background-color: #ef4444; color: white;">Critical Alerts</div>
+            </div>
+            <img class="camera-feed" src="/video_feed?camera=3" alt="Camera 3 Feed">
+        </div>
+    </div>
+
+</body>
+</html>
